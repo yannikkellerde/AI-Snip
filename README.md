@@ -11,14 +11,14 @@ If you are python-savy, you may instead:
 3. `python aisnip.py` from the root of this repo
 
 ### Linux installation
-There is no uniform system tray in Linux. So in Linux you will only be able to do one clip each time you run this program.
+There is no uniform system tray in Linux. So in Linux you will only be able to do one snip each time you run this program.
 
 There are no binaries provided for Linux.
 
 * Tested with python 3.11, but other versions should work.
 * For pyqt6 you will need libxcb-cursor0. So on Ubuntu, run `sudo apt install libxcb-cursor0`.
 * `pip install pyqt6 pyperclip`.
-* `python aisnip.py` when you are ready to go clipping.
+* `python aisnip.py` when you are ready to go snipping.
 
 ### Adding your API key
 You will need an *OpenAI* or *AzureOpenAI* API key to run AI-Snip
@@ -34,7 +34,7 @@ To start snipping, you can
 a) right-click on clippy in your system tray and then click `AI Snip`  
 b) Press `CTRL+SHIFT+A`
 
-During snipping, you are by default in explaination mode. When you snip a region, clippy will pop up after a few seconds and explain whatever you clipped.
+During snipping, you are by default in explaination mode. When you snip a region, clippy will pop up after a few seconds and explain whatever you snipped.
 
 There are various hotkeys available while snipping:
 * **D**: Toggles clippy (always starts on)
