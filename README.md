@@ -21,11 +21,11 @@ There are no binaries provided for Linux.
 * `python aisnip.py` when you are ready to go clipping.
 
 ### Adding your API key
-You will need an **OpenAI** or **AzureOpenAI** API key to run AI-Snip
+You will need an *OpenAI* or *AzureOpenAI* API key to run AI-Snip
 
 There are two methods to add you api key.
 1. The simplest way to add your keys is to start the program and enter your OpenAI API key in the popup window. This will create an openai_api_key.txt file in your folder to remember the key for the next startup.
-2. A somewhat more clean way is to add your key to the environment variables. If **OPENAI_API_KEY** or **AZURE_OPENAI_API_KEY** is set, then aisnip will use them automatically.
+2. A somewhat more clean way is to add your key to the environment variables. If *OPENAI_API_KEY* or *AZURE_OPENAI_API_KEY* is set, then aisnip will use them automatically.
 
 ## Usage
 When you start AI-Snip, it will minize itself to the system tray.
