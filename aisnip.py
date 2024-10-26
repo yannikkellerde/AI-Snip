@@ -32,8 +32,9 @@ from speech_bubble import SpeechBubbleWidget
 from write_text import TextInputWidget
 from get_text_input import TextInputCapture
 import pyperclip
-import keyboard
 import time
+if os.name == "nt":
+    import keyboard
 
 
 class SnippingTool(QMainWindow):
@@ -62,6 +63,7 @@ class SnippingTool(QMainWindow):
 
     def showFullScreen(self) -> None:
         super().showFullScreen()
+        print("Fullscreen is happening")
         self.begin = self.end = None
         self.clippy_enabled = True
         self.clipboard_enabled = False
@@ -111,8 +113,6 @@ class SnippingTool(QMainWindow):
         else:
             reply = self.model.complete(messages)
 
-        if self.clipboard_enabled:
-            pyperclip.copy(reply)
         return reply
 
     def mousePressEvent(self, event):
@@ -133,10 +133,14 @@ class SnippingTool(QMainWindow):
             if text_widget.isVisible():
                 text_widget.close()
             reply = self.get_ai_complete(file_path)
+            if self.clipboard_enabled:
+                pyperclip.copy(reply)
             speech_bubble.reset(reply)
             if self.clippy_enabled:
                 if not speech_bubble.isVisible():
                     speech_bubble.show()
+            elif os.name == "posix":
+                sys.exit()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape or event.key() == Qt.Key.Key_Q:
@@ -211,40 +215,47 @@ elif os.path.isfile("openai_api_key.txt"):
     model = OpenAIModelWrapper(api_key=api_key)
 else:
     model = None
-
+    
 window = SnippingTool(model)
 speech_bubble = SpeechBubbleWidget()
 text_widget = TextInputWidget()
 
+def tex_callback(x):
+    window.set_model(OpenAIModelWrapper(api_key=store_api_key(x)))
+    if os.name == "posix":
+        window.showFullScreen()
+
 if model is None:
     text_cap = TextInputCapture(
-        lambda x: window.set_model(OpenAIModelWrapper(api_key=store_api_key(x)))
+        tex_callback
     )
     text_cap.show()
 
-tray_icon = QSystemTrayIcon(QIcon(resource_path("clippy.png")))
-tray_icon.setToolTip("AI Snip tool")
+elif os.name == "posix":
+    window.showFullScreen()
 
-tray_menu = QMenu()
-show_action = QAction("AI Snip (CTRL + SHIFT + A)")
-response_action = QAction("Show AI response")
-text_write_action = QAction("Show text input")
-quit_action = QAction("Quit")
-show_action.triggered.connect(window.showFullScreen)
-response_action.triggered.connect(speech_bubble.show)
-text_write_action.triggered.connect(text_widget.show)
-quit_action.triggered.connect(app.quit)
+if os.name == "nt":
+    tray_icon = QSystemTrayIcon(QIcon(resource_path("clippy.png")))
+    tray_icon.setToolTip("AI Snip tool")
 
-tray_menu.addAction(show_action)
-tray_menu.addAction(response_action)
-tray_menu.addAction(quit_action)
-tray_icon.setContextMenu(tray_menu)
+    tray_menu = QMenu()
+    show_action = QAction("AI Snip (CTRL + SHIFT + A)")
+    response_action = QAction("Show AI response")
+    text_write_action = QAction("Show text input")
+    quit_action = QAction("Quit")
+    show_action.triggered.connect(window.showFullScreen)
+    response_action.triggered.connect(speech_bubble.show)
+    text_write_action.triggered.connect(text_widget.show)
+    quit_action.triggered.connect(app.quit)
 
-tray_icon.show()
+    tray_menu.addAction(show_action)
+    tray_menu.addAction(response_action)
+    tray_menu.addAction(quit_action)
+    tray_icon.setContextMenu(tray_menu)
 
-keyboard.add_hotkey("CTRL + SHIFT + A", show_action.trigger)
+    tray_icon.show()
 
-window.showFullScreen()
-window.close()
+    keyboard.add_hotkey("CTRL + SHIFT + A", show_action.trigger)
+
 
 sys.exit(app.exec())

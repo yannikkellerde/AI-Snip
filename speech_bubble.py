@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel
 import sys
+import os
 from PyQt6.QtCore import Qt, QTimer, QRectF, QPointF, QRect
 from PyQt6.QtGui import QPainter, QColor, QFont, QFontMetrics, QPainterPath, QPixmap
 from functools import lru_cache
@@ -170,6 +171,8 @@ class SpeechBubbleWidget(QWidget):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape or event.key() == Qt.Key.Key_Q:
             self.close()
+            if os.name == "posix":
+                sys.exit()
 
 
 if __name__ == "__main__":
