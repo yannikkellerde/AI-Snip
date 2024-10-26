@@ -42,3 +42,8 @@ There are various hotkeys available while snipping:
 * **E**: Go into translation into english mode. Will also set clipboard on.
 * **L**: Go into Latex mode. Toggles clippy off and clipboard on.
 * **T**: Free prompt mode. Write your own prompt for the AI to answer.
+
+## Adding to startup
+If you want to use AI-Snip as an everyday tool, you may want to always have it in your system tray.
+
+The easiest way to accomplish this is to donwload the binary, create a Shortcut for it, then go `win + r` and type `shell:startup` and press Enter. Then move your shortcut in the folder that opened.
