@@ -42,6 +42,7 @@ There are various hotkeys available while snipping:
 * **E**: Go into translation into english mode. Will also set clipboard on.
 * **L**: Go into Latex mode. Toggles clippy off and clipboard on.
 * **T**: Free prompt mode. Write your own prompt for the AI to answer.
+* **Q** or **Esc**: Cancel your ongoing snip or close clippy (you may have to re-select the clippy window if you de-selected it).
 
 ## Adding to startup
 If you want to use AI-Snip as an everyday tool, you may want to always have it in your system tray.
