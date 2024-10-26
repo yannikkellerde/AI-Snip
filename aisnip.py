@@ -63,7 +63,6 @@ class SnippingTool(QMainWindow):
 
     def showFullScreen(self) -> None:
         super().showFullScreen()
-        print("Fullscreen is happening")
         self.begin = self.end = None
         self.clippy_enabled = True
         self.clipboard_enabled = False
@@ -257,5 +256,7 @@ if os.name == "nt":
 
     keyboard.add_hotkey("CTRL + SHIFT + A", show_action.trigger)
 
+    window.showFullScreen()
+    window.close()
 
 sys.exit(app.exec())
