@@ -39,6 +39,10 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
+def stream_wrapper(stream):
+    for response in stream:
+        yield response.choices[0].delta.content
+
 
 class ModelWrapper:
     def __init__(
@@ -62,7 +66,13 @@ class ModelWrapper:
             with open(self.log_file, "a") as f:
                 f.write(json.dumps(msg_copy) + ",\n")
         return response.choices[0].message.content
-
+    
+    def stream_complete(self, messages: list[dict[str, str]], **kwargs) -> str:
+        response = self.client.chat.completions.create(
+            model=self.model_name, messages=messages, stream=True, **kwargs
+        )
+        return stream_wrapper(response)
+            
     def structured_complete(
         self, messages: list[dict[str, str]], structure_class: Type, **kwargs
     ) -> ParsedChatCompletionMessage:

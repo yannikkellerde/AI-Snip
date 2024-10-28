@@ -1,10 +1,12 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel
 import sys
+import time
 import os
 from PyQt6.QtCore import Qt, QTimer, QRectF, QPointF, QRect
 from PyQt6.QtGui import QPainter, QColor, QFont, QFontMetrics, QPainterPath, QPixmap
 from functools import lru_cache
 from util import resource_path
+from typing import Generator
 
 
 class SpeechBubbleWidget(QWidget):
@@ -29,13 +31,17 @@ class SpeechBubbleWidget(QWidget):
         self.img_height = int(self.pixmap.height() * scale_factor)
         self.img_width = int(self.pixmap.width() * scale_factor)
 
-    def reset(self, text):
-        self.full_text = text
+    def reset(self, text:str|Generator):
+        self.full_text:str|Generator = text
+        self.sudo_full_text = self.full_text if isinstance(self.full_text, str) else ""
         self.displayed_text = ""
         self.char_index = 0
-        self.opacity = 0.0
+        self.opacity = 0.25
 
-        bubble_width = 300 + max(0, min(300, (len(self.full_text) - 100) // 2))
+        if isinstance(self.full_text, str):
+            bubble_width = 300 + max(0, min(300, (len(self.full_text) - 100) // 2))
+        else:
+            bubble_width = 500
         self.resize(bubble_width, 150)
 
         # Timer for the typewriter effect
@@ -46,11 +52,19 @@ class SpeechBubbleWidget(QWidget):
     def update_text(self):
         # Add one more character each time the timer fires
         if self.opacity > 0.25:
-            if self.char_index < len(self.full_text):
+            add = None
+            if not isinstance(self.full_text, str):
+                try:
+                    add = next(self.full_text)
+                    if add is not None:
+                        self.sudo_full_text += add
+                except StopIteration:
+                    add = None
+            if self.char_index < len(self.sudo_full_text):
                 self.char_index += 1
-                self.displayed_text = self.full_text[: self.char_index]
+                self.displayed_text = self.sudo_full_text[: self.char_index]
                 self.update()  # Trigger a repaint
-            elif self.opacity == 1.0:
+            elif self.opacity == 1.0 and add is None:
                 self.timer.stop()  # Stop timer when all characters are displayed
         if self.opacity < 1.0:
             self.opacity = min(1.0, self.opacity + 0.01)
@@ -98,7 +112,10 @@ class SpeechBubbleWidget(QWidget):
         max_width = self.rect().width() - 60  # Padding for text within bubble
 
         lines, line_req = self.compute_height(self.displayed_text, metrics, max_width)
-        _, max_req = self.compute_height(self.full_text, metrics, max_width)
+        if isinstance(self.full_text, str):
+            _, max_req = self.compute_height(self.full_text, metrics, max_width)
+        else:
+            max_req = max(line_req,900)
         diff = max_req - line_req
 
         total_height = max_req + 60 + self.img_height

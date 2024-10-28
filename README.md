@@ -38,7 +38,7 @@ During snipping, you are by default in explaination mode. When you snip a region
 
 There are various hotkeys available while snipping:
 * **D**: Toggles clippy (always starts on)
-* **C**: Toggles if AI response is copied to clipboard (always starts off)
+* **C**: Toggles if AI response is copied to clipboard (always starts off). This will also disable streaming, resulting in slower response times.
 * **E**: Go into translation into english mode. Will also set clipboard on.
 * **L**: Go into Latex mode. Toggles clippy off and clipboard on.
 * **T**: Free prompt mode. Write your own prompt for the AI to answer.

@@ -38,7 +38,7 @@ if os.name == "nt":
 
 
 class SnippingTool(QMainWindow):
-    def __init__(self, model: ModelWrapper):
+    def __init__(self, model: ModelWrapper, stream=True):
         super().__init__()
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
@@ -55,6 +55,7 @@ class SnippingTool(QMainWindow):
         self.end = None
         self.clippy_enabled = True
         self.clipboard_enabled = False
+        self.stream = stream
 
         self.model = model
 
@@ -110,7 +111,10 @@ class SnippingTool(QMainWindow):
             reply = """Got no API key. Either set the OPENAI_API_KEY environment variable
             or restart AI Snip and enter your key."""
         else:
-            reply = self.model.complete(messages)
+            if self.stream and self.clippy_enabled and not self.clipboard_enabled:
+                reply = self.model.stream_complete(messages)
+            else:
+                reply = self.model.complete(messages)
 
         return reply
 
