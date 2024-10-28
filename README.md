@@ -7,7 +7,7 @@ The most easy way to run AI-Snip is by downloading the binary from the releases 
 
 If you are python-savy, you may instead:
 1. Clone this repo
-2. `pip install pyqt6 pyperclip keyboard`
+2. `pip install pyqt6 pyperclip keyboard openai`
 3. `python aisnip.py` from the root of this repo
 
 ### Linux installation
@@ -17,7 +17,7 @@ There are no binaries provided for Linux.
 
 * Tested with python 3.11, but other versions should work.
 * For pyqt6 you will need libxcb-cursor0. So on Ubuntu, run `sudo apt install libxcb-cursor0`.
-* `pip install pyqt6 pyperclip`.
+* `pip install pyqt6 pyperclip openai`.
 * `python aisnip.py` when you are ready to go snipping.
 
 ### Adding your API key
