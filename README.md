@@ -5,7 +5,7 @@ https://github.com/user-attachments/assets/b3ebcbc1-7010-4f44-bdaa-0c7998e655f6
 ### Windows installation
 The most easy way to run AI-Snip is by downloading the binary from the releases page and running it.
 
-If you are python-savy, you may instead:
+If you are python-savvy, you may instead:
 1. Clone this repo
 2. `pip install pyqt6 pyperclip keyboard openai`
 3. `python aisnip.py` from the root of this repo
@@ -20,18 +20,30 @@ There are no binaries provided for Linux.
 * `pip install pyqt6 pyperclip openai`.
 * `python aisnip.py` when you are ready to go snipping.
 
-### Adding your API key
-You will need an *OpenAI* or *AzureOpenAI* API key to run AI-Snip
+### Choosing your backend
+You'll need an LLM backend to run AI-Snip. Currently available options are
+1. OpenAI with an api key
+2. Ollama running locally
+
+### Adding your API key for OpenAI
+If you choose OpenAI as your backend, you will need an *OpenAI* or *AzureOpenAI* API key to run AI-Snip
 
 There are two methods to add you api key.
 1. The simplest way to add your keys is to start the program and enter your OpenAI API key in the popup window. This will create an openai_api_key.txt file in your folder to remember the key for the next startup.
 2. A somewhat more clean way is to add your key to the environment variables. If *OPENAI_API_KEY* or *AZURE_OPENAI_API_KEY* is set, then aisnip will use them automatically.
 
+### Running with Ollama
+Follow the [ollama](https://github.com/ollama/ollama) site to get your ollama server up and running.
+
+Then, copy the contents of `config.yml.ollama` into a file named `config.yml` saved in the same folder as your `aisnip.exe` binary or `aisnip.py` depending on if you run with the binary or the python interpreter.
+
+Change the model_name and ollama_host depending on your setup/likings.
+
 ## Usage
 When you start AI-Snip, it will minize itself to the system tray.
 
 To start snipping, you can  
-a) right-click on clippy in your system tray and then click `AI Snip`  
+a) Left click on clippy in the system tray
 b) Press `CTRL+SHIFT+A`
 
 During snipping, you are by default in explaination mode. When you snip a region, clippy will pop up after a few seconds and explain whatever you snipped.

@@ -23,11 +23,10 @@ from PyQt6.QtWidgets import (
 )
 from util import (
     local_image_to_data_url,
-    AzureModelWrapper,
-    OpenAIModelWrapper,
-    ModelWrapper,
     resource_path
 )
+from model_wrapper import ModelWrapper
+from config import Config
 from speech_bubble import SpeechBubbleWidget
 from write_text import TextInputWidget
 from get_text_input import TextInputCapture
@@ -36,9 +35,11 @@ import time
 if os.name == "nt":
     import keyboard
 
+basepath = os.path.abspath(os.path.dirname(sys.executable)) if getattr(sys, "frozen", False) else os.path.abspath(os.path.dirname(__file__))
+
 
 class SnippingTool(QMainWindow):
-    def __init__(self, model: ModelWrapper, stream=True):
+    def __init__(self, model: ModelWrapper, config:Config):
         super().__init__()
         self.setWindowFlags(
             Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint
@@ -55,7 +56,8 @@ class SnippingTool(QMainWindow):
         self.end = None
         self.clippy_enabled = True
         self.clipboard_enabled = False
-        self.stream = stream
+        self.stream = config.stream
+        self.snip_config = config
 
         self.model = model
 
@@ -92,7 +94,10 @@ class SnippingTool(QMainWindow):
             painter.drawRect(rect)
 
     def get_ai_complete(self, img_path):
-        data_url = local_image_to_data_url(img_path)
+        if self.snip_config.llm_provider == "ollama":
+            data_url = img_path
+        else:
+            data_url = local_image_to_data_url(img_path)
         messages = [
             {
                 "role": "user",
@@ -200,33 +205,44 @@ class SnippingTool(QMainWindow):
 
 
 def store_api_key(api_key):
-    with open("openai_api_key.txt", "w") as f:
-        f.write(api_key)
+    config.api_key = api_key
+    config.save_to_yaml(cfg_path)
     return api_key
 
 
 app = QApplication(sys.argv)
 app.setQuitOnLastWindowClosed(False)
 
-if os.environ.get("OPENAI_API_KEY") is not None:
-    model = OpenAIModelWrapper()
-elif os.environ.get("AZURE_OPENAI_API_KEY") is not None:
-    model = AzureModelWrapper()
-elif os.path.isfile("openai_api_key.txt"):
-    with open("openai_api_key.txt") as f:
-        api_key = f.read().strip()
-    model = OpenAIModelWrapper(api_key=api_key)
+cfg_path = os.path.join(basepath, "config.yml")
+if os.path.exists(cfg_path):
+    config = Config.load_from_yaml(cfg_path)
 else:
-    model = None
-    
-window = SnippingTool(model)
-speech_bubble = SpeechBubbleWidget()
-text_widget = TextInputWidget()
+    config = Config()
 
 def tex_callback(x):
     window.set_model(OpenAIModelWrapper(api_key=store_api_key(x)))
     if os.name == "posix":
         window.showFullScreen()
+
+if config.llm_provider == "ollama":
+    from ollama_model_wrapper import OllamaModelWrapper
+    model = OllamaModelWrapper(config)
+else:
+    api_key = os.environ.get("OPENAI_API_KEY", config.api_key) if config.llm_provider == "openai" else os.environ.get("AZURE_OPENAI_API_KEY", config.api_key)
+    if api_key is None:
+        model = None
+    else:
+        if config.llm_provider == "openai":
+            from openai_model_wrapper import OpenAIModelWrapper
+            model = OpenAIModelWrapper(api_key=api_key, model_name=config.model_name)
+        elif config.llm_provider == "azure":
+            from openai_model_wrapper import AzureModelWrapper
+            model = AzureModelWrapper(api_key=api_key, model_name=config.model_name)
+
+window = SnippingTool(model, config)
+speech_bubble = SpeechBubbleWidget()
+text_widget = TextInputWidget()
+
 
 if model is None:
     text_cap = TextInputCapture(
@@ -236,6 +252,10 @@ if model is None:
 
 elif os.name == "posix":
     window.showFullScreen()
+    
+def on_tray_icon_activated(reason):
+    if reason == QSystemTrayIcon.ActivationReason.Trigger:
+        window.showFullScreen()
 
 if os.name == "nt":
     tray_icon = QSystemTrayIcon(QIcon(resource_path("clippy.png")))
@@ -255,6 +275,7 @@ if os.name == "nt":
     tray_menu.addAction(response_action)
     tray_menu.addAction(quit_action)
     tray_icon.setContextMenu(tray_menu)
+    tray_icon.activated.connect(on_tray_icon_activated)
 
     tray_icon.show()
 
