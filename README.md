@@ -33,7 +33,8 @@ There are two methods to add you api key.
 2. A somewhat more clean way is to add your key to the environment variables. If *OPENAI_API_KEY* or *AZURE_OPENAI_API_KEY* is set, then aisnip will use them automatically.
 
 ### Running with Ollama
-Follow the [ollama](https://github.com/ollama/ollama) site to get your ollama server up and running.
+Follow the [ollama](https://github.com/ollama/ollama) site to get your ollama server up and running.  
+Install ollama for python `pip install ollama`
 
 Then, copy the contents of `config.yml.ollama` into a file named `config.yml` saved in the same folder as your `aisnip.exe` binary or `aisnip.py` depending on if you run with the binary or the python interpreter.
 
@@ -43,7 +44,7 @@ Change the model_name and ollama_host depending on your setup/likings.
 When you start AI-Snip, it will minize itself to the system tray.
 
 To start snipping, you can  
-a) Left click on clippy in the system tray
+a) Left click on clippy in the system tray  
 b) Press `CTRL+SHIFT+A`
 
 During snipping, you are by default in explaination mode. When you snip a region, clippy will pop up after a few seconds and explain whatever you snipped.
