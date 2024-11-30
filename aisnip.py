@@ -154,6 +154,8 @@ class SnippingTool(QMainWindow):
         if event.key() == Qt.Key.Key_Escape or event.key() == Qt.Key.Key_Q:
             self.close()
             text_widget.close()
+            if os.name == "posix":
+                sys.exit()
 
         if event.key() == Qt.Key.Key_C:
             self.clipboard_enabled = not self.clipboard_enabled
